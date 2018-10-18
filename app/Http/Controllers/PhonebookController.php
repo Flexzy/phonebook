@@ -48,7 +48,8 @@ class PhonebookController extends Controller
             'phone' => $request->phone,
         ];
 
-        Phonebook::create($phoneRequest);        
+        $phonebook = Phonebook::create($phoneRequest);  
+        return $phonebook;      
     }
 
     public function getData() {
@@ -84,9 +85,20 @@ class PhonebookController extends Controller
      * @param  \App\Phonebook  $phonebook
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Phonebook $phonebook)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:phonebooks,email,'.$id,
+            'phone' => 'required|numeric',
+        ]);
+
+        $phonebook = Phonebook::find($id);
+        $phonebook->name = $request->name;
+        $phonebook->email = $request->email;
+        $phonebook->phone = $request->phone;
+        $phonebook->save();
+
     }
 
     /**
@@ -95,8 +107,11 @@ class PhonebookController extends Controller
      * @param  \App\Phonebook  $phonebook
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Phonebook $phonebook)
+    public function destroy($id)
     {
-        //
+        $phonebook = Phonebook::find($id);
+        $phonebook->delete();
+
+        return 'Contact successfully deleted';
     }
 }
